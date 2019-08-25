@@ -18,9 +18,9 @@ class DefaultController extends Controller
      */
     public function indexAction(Request $request)
     {
-        $context=$this->createOrUseConnection($this->getParameter('topic_rb'),$this->getParameter('queue_rb'));
+        $context = $this->createOrUseConnection($this->getParameter('topic_rb'), $this->getParameter('queue_rb'));
         $form = $this->createFormBuilder()
-            ->add('Send Request', SubmitType::class, ['attr' => ['class'=>'btn draw-border']])
+            ->add('Send Request', SubmitType::class, ['attr' => ['class' => 'btn draw-border']])
             ->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -28,25 +28,31 @@ class DefaultController extends Controller
              * Randomly pick an endpoint to call
              * By default Get information about SpaceX
              */
-            switch (rand(1,3)){
-                case 1:    $message = $context->createMessage('roadster');
-                break;
-                case 2:  $message = $context->createMessage('rockets');
-                break;
-                case 3:  $message = $context->createMessage('missions');
-                break;
-                default:  $message = $context->createMessage('info');
+            switch (rand(1, 3)) {
+                case 1:
+                    $message = $context->createMessage('roadster');
+                    break;
+                case 2:
+                    $message = $context->createMessage('rockets');
+                    break;
+                case 3:
+                    $message = $context->createMessage('missions');
+                    break;
+                default:
+                    $message = $context->createMessage('info');
             }
 
             $context->createProducer()->send($this->createOrUseQueue($context, $this->getParameter('queue_rb')), $message);
-            return $this->render('default/index.html.twig',['form'=>$form->createView()]);
+            return $this->render('default/index.html.twig', ['form' => $form->createView()]);
         }
-        return $this->render('default/index.html.twig',['form'=>$form->createView()]);
+        return $this->render('default/index.html.twig', ['form' => $form->createView()]);
     }
+
     /*
      * Create or use an existant Context and topic
      */
-    public function createOrUseConnection($topicName,$queueName){
+    public function createOrUseConnection($topicName, $queueName)
+    {
         $factory = new AmqpConnectionFactory([
             'host' => $this->getParameter('host_rb'),
             'port' => $this->getParameter('port_rb'),
@@ -61,14 +67,16 @@ class DefaultController extends Controller
         $topic = $context->createTopic($topicName);
         $topic->setType(AmqpTopic::TYPE_DIRECT);
         $context->declareTopic($topic);
-        $queue=$this->createOrUseQueue($context,$queueName);
+        $queue = $this->createOrUseQueue($context, $queueName);
         $context->bind(new AmqpBind($topic, $queue));
         return $context;
     }
+
     /*
      * Create or use an existant Queue
      */
-    public function createOrUseQueue($context,$queueName){
+    public function createOrUseQueue($context, $queueName)
+    {
         $queue = $context->createQueue($queueName);
         $queue->addFlag(AmqpQueue::FLAG_DURABLE);
         $context->declareQueue($queue);
