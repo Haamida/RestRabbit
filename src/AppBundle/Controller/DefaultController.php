@@ -69,9 +69,9 @@ class DefaultController extends Controller
      * Create or use an existant Queue
      */
     public function createOrUseQueue($context,$queueName){
-        $fooQueue = $context->createQueue($queueName);
-        $fooQueue->addFlag(AmqpQueue::FLAG_DURABLE);
-        $context->declareQueue($fooQueue);
-        return $fooQueue;
+        $queue = $context->createQueue($queueName);
+        $queue->addFlag(AmqpQueue::FLAG_DURABLE);
+        $context->declareQueue($queue);
+        return $queue;
     }
 }
