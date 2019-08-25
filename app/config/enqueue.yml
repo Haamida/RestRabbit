@@ -1,5 +1,4 @@
 enqueue:
   default:
     transport: 'amqp+lib:'
-    client:
-      traceable_producer: true
+    client: ~
