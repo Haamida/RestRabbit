@@ -24,8 +24,20 @@ class DefaultController extends Controller
             ->getForm();
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $message = $context->createMessage('test');
-            // Send message to queue
+            /*
+             * Randomly pick an endpoint to call
+             * By default Get information about SpaceX
+             */
+            switch (rand(1,3)){
+                case 1:    $message = $context->createMessage('roadster');
+                break;
+                case 2:  $message = $context->createMessage('rockets');
+                break;
+                case 3:  $message = $context->createMessage('missions');
+                break;
+                default:  $message = $context->createMessage('info');
+            }
+
             $context->createProducer()->send($this->createOrUseQueue($context, $this->getParameter('queue_rb')), $message);
             return $this->render('default/index.html.twig',['form'=>$form->createView()]);
         }
